@@ -60,7 +60,7 @@ class action_plugin_blogtng_edit extends DokuWiki_Action_Plugin{
         if (!$blog && !$INFO['exists']) $blog = $this->getConf('default_blog');
 
 	//Knuth
-//	msg( "handle_editform_output", -1);
+	msg( "handle_editform_output", -1);
 	$old_time =  $this->tools->getParam("old/time");
 	$other_format = $this->tools->getParam("new/format");
 
@@ -70,6 +70,9 @@ class action_plugin_blogtng_edit extends DokuWiki_Action_Plugin{
         $pos += 1;
 
         $event->data->insertElement($pos, form_makeMenuField('btng[post][blog]', $blogs, $blog, 'Blog', 'blogtng__blog', 'edit'));
+        $pos += 1;
+
+        $event->data->insertElement($pos, form_makeTextField('btng[old][time]', $old_time, 'OldTime', 'blogtng__old_time', 'edit'));
         $pos += 1;
 
 
@@ -102,7 +105,7 @@ class action_plugin_blogtng_edit extends DokuWiki_Action_Plugin{
         $pos += 1;
 
         if($this->getConf('editform_set_date')) {
-            $postdate = $this->tools->getParam('post/date');
+           $postdate = $this->tools->getParam('post/date');
             if($postdate) {
                 $YY = $postdate['YY'];
                 $MM = $postdate['MM'];
@@ -111,6 +114,7 @@ class action_plugin_blogtng_edit extends DokuWiki_Action_Plugin{
                 $mm = $postdate['mm'];
             } else {
                 $created = $this->entryhelper->entry['created'];
+
                 if($created) {
                     $YY = strftime('%Y', $created);
                     $MM = strftime('%m', $created);
@@ -186,12 +190,14 @@ class action_plugin_blogtng_edit extends DokuWiki_Action_Plugin{
                     $this->entryhelper->entry['blog'] = $blog;
                     $this->entryhelper->entry['commentstatus'] = $this->tools->getParam('post/commentstatus');
 
+		    $this->entryhelper->entry['oldTime'] = $this->tools->getParam('old/time');
+
                     if (empty($this->entryhelper->entry['page'])) {
 
                         $this->entryhelper->entry['page'] = $ID;
 
                     }
-
+//		    msg($this->tools->getParam(''), -1);
                     // allow to override created date
                     if($this->tools->getParam('post/date') && $this->getConf('editform_set_date')) {
                         foreach(array('hh', 'mm', 'MM', 'DD') as $key) {

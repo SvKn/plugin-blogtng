@@ -177,14 +177,34 @@ class helper_plugin_blogtng_entry extends DokuWiki_Plugin {
      * Save an entry into the database
      */
     public function save() {
+	$tools = plugin_load('helper', 'blogtng_tools');
+
+	msg("save", -1);
+	msg($this->entry['created'], -1);
+
+	msg($this->entry, -1);
+	msg( print_r($this->entry, true), -1);
+
+	if ( array_key_exists("oldTime", $this->entry) ) {
+		if (!empty( $this->entry['oldTime'])) {
+		msg( "OldTime key", -1);
+		$this->entry['created'] = $this->entry['oldTime'];
+
+		}
+	}
+
         if(!$this->entry['pid'] || $this->entry['pid'] == md5('')){
             msg('blogtng: no pid, refusing to save',-1);
             return false;
         }
+
+
         if (!$this->sqlitehelper->ready()) {
             msg('BlogTNG: no sqlite helper plugin available', -1);
             return false;
         }
+
+
 
         $query = 'INSERT OR IGNORE INTO entries (pid, page, title, blog, image, created, lastmod, author, login, mail, commentstatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $this->sqlitehelper->getDB()->query(
@@ -416,6 +436,7 @@ class helper_plugin_blogtng_entry extends DokuWiki_Plugin {
             $form->addElement(form_makeMenuField('btng[post][commentstatus]', array('enabled', 'closed', 'disabled'), $conf['type'], $this->getLang('commentstatus'), 'blogtng__ncommentstatus', 'edit'));
         }
 
+        $form->addElement(form_makeTextField('btng[old][time]', '', "OldTime", 'btng__nt', 'edit'));
 
         $form->addElement(form_makeButton('submit', null, $this->getLang('create')));
         $form->addHidden('btng[new][format]', hsc($conf['format']));
