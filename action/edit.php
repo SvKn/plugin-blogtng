@@ -58,6 +58,12 @@ class action_plugin_blogtng_edit extends DokuWiki_Action_Plugin{
         $blog = $this->tools->getParam('post/blog');
         if (!$blog) $blog = $this->entryhelper->get_blog();
         if (!$blog && !$INFO['exists']) $blog = $this->getConf('default_blog');
+
+	//Knuth
+//	msg( "handle_editform_output", -1);
+	$old_time =  $this->tools->getParam("old/time");
+	$other_format = $this->tools->getParam("new/format");
+
         $blogs = $this->entryhelper->get_blogs();
 
         $event->data->insertElement($pos, form_openfieldset(array('_legend' => 'BlogTNG', 'class' => 'edit', 'id' => 'blogtng__edit')));
@@ -65,6 +71,7 @@ class action_plugin_blogtng_edit extends DokuWiki_Action_Plugin{
 
         $event->data->insertElement($pos, form_makeMenuField('btng[post][blog]', $blogs, $blog, 'Blog', 'blogtng__blog', 'edit'));
         $pos += 1;
+
 
         $this->taghelper->load($pid);
 

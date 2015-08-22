@@ -54,16 +54,37 @@ class action_plugin_blogtng_new extends DokuWiki_Action_Plugin{
             return true;
         }
 
+
         $event->preventDefault();
+
+	$new_format = $tools->getParam('new/format');
+
         $new = $tools->mkpostid($tools->getParam('new/format'),$tools->getParam('new/title'));
+	$time = '';
+
+	if ( $tools->getParam('old/time') ) {
+		$time = $tools->getParam('old/time');
+
+		if ( !$this->isValidTimeStamp($time) ) {
+			msg("Not a valid timestamp: " . $time, -1);
+			return true;
+		}
+
+		$other_format = "blog:" . date("Y-m-d", $time) .":%{title}";
+		$new = $tools->mkpostid($other_format,$tools->getParam('new/title'));
+		$new_format = $other_format;
+	}
+
+
         if ($ID != $new) {
             $urlparams = array(
                 'do' => 'btngnew',
                 'btng[post][blog]' => $tools->getParam('post/blog'),
                 'btng[post][tags]' => $tools->getParam('post/tags'),
                 'btng[post][commentstatus]' => $tools->getParam('post/commentstatus'),
-                'btng[new][format]' => $tools->getParam('new/format'),
-                'btng[new][title]' => $tools->getParam('new/title')
+       	        'btng[new][format]' => $new_format,
+                'btng[new][title]' => $tools->getParam('new/title'),
+                'btng[old][time]' => $time
             );
             send_redirect(wl($new,$urlparams,true,'&'));
             return false; //never reached
@@ -92,6 +113,13 @@ class action_plugin_blogtng_new extends DokuWiki_Action_Plugin{
         );
         $tpl = str_replace(array_keys($replace), array_values($replace), $tpl);
         return $tpl;
+    }
+
+    function isValidTimeStamp($timestamp)
+    {
+    	return ((string) (int) $timestamp === $timestamp) 
+        	&& ($timestamp <= PHP_INT_MAX)
+	        && ($timestamp >= ~PHP_INT_MAX);
     }
 }
 // vim:ts=4:sw=4:et:
